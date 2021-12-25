@@ -34,7 +34,7 @@ signIn = async (req, res, next) => {
   }
   const response = await auth.signIn(params);
   if (response.status != 200) {
-    return next(appError.badRequest("User not found"));
+    return next(appError.badRequest("Username or password is wrong"));
   }
   const userData = {
     id: response.user.id,

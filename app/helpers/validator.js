@@ -16,8 +16,18 @@ validateSignIn = (params) => {
   });
   return schema.validate(params);
 };
-
+validateCourse = (params) => {
+  const schema = Joi.object({
+    name: Joi.string().required(),
+    description: Joi.string().required(),
+    goal: Joi.string().required(),
+    img: Joi.string().required(),
+    requirement: Joi.string().allow(null, ""),
+  });
+  return schema.validate(params);
+};
 module.exports = {
   validateSignUp,
   validateSignIn,
+  validateCourse,
 };

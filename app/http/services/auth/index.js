@@ -27,7 +27,7 @@ const signUp = async ({ name, email, password, confirmCode }) => {
       email: user.email,
       roles: user.roles,
     },
-    status: 200,
+    status: 201,
     message: "sign-up success",
   };
 };
