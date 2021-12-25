@@ -1,0 +1,34 @@
+version: "3.0"
+services:
+  webserver:
+    image: node:16.12.0
+    tty: true
+    ports:
+      - 82:3000
+    volumes:
+      - .:/opt/app
+    environment:
+      - NODE_ENV=dev
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+    restart: always
+  mongodb:
+    image: mongo:4.2.1-bionic
+    ports:
+      - 27018:27017
+    volumes:
+      - dbdata:/data/db
+    networks:
+      - app-network
+    environment:
+      - MONGO_INITDB_DATABASE=app
+      # - MONGO_INITD_ROOT_USERNAME=admin
+      # - MONGO_INITDB_ROOT_PASSWORD=admin
+    restart: always
+volumes:
+  dbdata:
+networks:
+  app-network:
+    driver: bridge
