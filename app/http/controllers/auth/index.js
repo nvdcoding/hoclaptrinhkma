@@ -64,13 +64,46 @@ signIn = async (req, res, next) => {
   const time = parseInt(refreshTokenLife);
   const tokenCreated = await Token.create({
     user: userData.id,
-    token: accessToken,
     refreshToken: refreshToken,
     expiredAt: date.addDays(now, time),
   });
   return res
     .status(200)
     .json({ status: 200, userData, accessToken, refreshToken });
+};
+refreshToken = async (req, res) => {
+  const accessTokenLife = process.env.ACCESS_TOKEN_LIFE || "1h";
+  const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "nguyen-duy-kma";
+  const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE || "7d";
+  const refreshTokenSecret =
+    process.env.REFRESH_TOKEN_SECRET || "r-nguyen-duy-kma";
+  const refreshTokenClient = req.body.refreshToken;
+  if (!refreshTokenClient) {
+    return next(app.Error.badRequest("No refresh token provided"));
+  }
+  const refreshToken = await Token.findOne({
+    refreshToken: refreshTokenClient,
+  });
+  if (!refreshToken) {
+    return next(appError.badRequest("No refresh token found"));
+  }
+  try {
+    const decoded = await jwtHelper.verify(
+      refreshTokenClient,
+      refreshTokenSecret
+    );
+    const userData = decoded.data;
+    const accessToken = await jwtHelper.generateToken(
+      userData,
+      accessTokenSecret,
+      accessTokenLife
+    );
+    res.status(200).json({
+      accessToken,
+    });
+  } catch (error) {
+    return next(appError.badRequest("Invalid Token"));
+  }
 };
 logout = async (req, res, next) => {
   const params = {
@@ -89,4 +122,5 @@ module.exports = {
   signUp,
   signIn,
   logout,
+  refreshToken,
 };

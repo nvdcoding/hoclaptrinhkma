@@ -5,10 +5,6 @@ const Token = new Schema({
   user: {
     type: String,
   },
-  token: {
-    type: String,
-    index: true,
-  },
   refreshToken: { type: String, unique: true },
   status: {
     type: String,
