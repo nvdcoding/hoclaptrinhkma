@@ -3,8 +3,8 @@ const bcrypt = require("bcrypt");
 const { generate } = require("../../../helpers/jwt");
 const User = require("../../../models/User");
 const Roles = require("../../../enums/Roles");
-
-const signUp = async ({ name, email, password, confirmCode }) => {
+const mailer = require("../../../helpers/mailer");
+const signUp = async ({ name, email, password }) => {
   const check = await User.findOne({ email: email }).exec();
   if (check) {
     return {
@@ -20,6 +20,18 @@ const signUp = async ({ name, email, password, confirmCode }) => {
     password: hash,
     roles: Roles.USER,
   });
+  try {
+    const link = `${process.env.DOMAIN_API}/auth/active/${user._id}`;
+    const mailContent = `Bạn vui lòng truy cập link: ${link} <br>Để kích hoạt tài khoản`;
+    await mailer.sendMail(email, "Kích hoạt tài khoản", mailContent);
+  } catch (e) {
+    console.log(e);
+    return {
+      status: 400,
+      message: e,
+    };
+  }
+
   return {
     data: {
       id: user._id,
@@ -33,12 +45,7 @@ const signUp = async ({ name, email, password, confirmCode }) => {
 };
 const signIn = async ({ email, password }) => {
   const user = await User.findOne({ email: email }).exec();
-  if (!user) {
-    return {
-      status: 400,
-      message: "User not found",
-    };
-  }
+
   const match = await bcrypt.compare(password, user.password);
   if (match) {
     return {
@@ -58,7 +65,25 @@ const signIn = async ({ email, password }) => {
     };
   }
 };
+const activeAccount = async (userId) => {
+  const user = await User.findOne({ _id: userId }).exec();
+  if (!user) {
+    return {
+      status: 400,
+      message: "User not found",
+    };
+  }
+  const result = await User.findOneAndUpdate(
+    { _id: userId },
+    { status: "active" }
+  );
+  return {
+    status: 200,
+    message: "Account is active",
+  };
+};
 module.exports = {
   signUp,
   signIn,
+  activeAccount,
 };

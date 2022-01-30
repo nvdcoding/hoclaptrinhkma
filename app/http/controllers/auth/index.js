@@ -23,6 +23,17 @@ signUp = async (req, res, next) => {
     message: response.message,
   });
 };
+activeAccount = async (req, res, next) => {
+  const userId = req.params.id;
+  if (!userId) {
+    return next(appError.badRequest("No userID provided"));
+  }
+  const response = await auth.activeAccount(userId);
+  return res.status(response.status).json({
+    status: response.status,
+    message: response.message,
+  });
+};
 signIn = async (req, res, next) => {
   const params = {
     email: req.body.email,
@@ -122,5 +133,6 @@ module.exports = {
   signUp,
   signIn,
   logout,
+  activeAccount,
   refreshToken,
 };

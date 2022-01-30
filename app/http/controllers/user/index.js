@@ -36,6 +36,28 @@ const changePassword = async (req, res, next) => {
     message: response.message,
   });
 };
+const addCourse = async (req, res, next) => {
+  const courseId = req.body.courseId;
+  if (!courseId) {
+    return next(appError.badRequest("Invalid course"));
+  }
+  const response = await userService.addCourse(courseId, req.jwtDecoded.id);
+  return res.status(response.status).json({
+    status: response.status,
+    message: response.message,
+  });
+};
+const storePost = async (req, res, next) => {
+  const postId = req.body.postId;
+  if (!postId) {
+    return next(appError.badRequest("Invalid postId"));
+  }
+  const response = await userService.storePost(postId, req.jwtDecoded.id);
+  return res.status(response.status).json({
+    status: response.status,
+    message: response.message,
+  });
+};
 /* By ADMIN */
 const setUserStatus = async (req, res, next) => {
   const params = {
@@ -73,6 +95,21 @@ const setUserRole = async (req, res, next) => {
     message: response.message,
   });
 };
+const setModCourse = async (req, res, next) => {
+  const params = {
+    userId: req.params.id,
+    course: req.body.course,
+  };
+  const check = validator.validateModCourse(params);
+  if (check.error) {
+    return next(appError.badRequest(check.error.details[0].message));
+  }
+  const response = await userService.setModCourse(params);
+  return res.status(response.status).json({
+    status: response.status,
+    message: response.message,
+  });
+};
 const deleteUser = async (req, res, next) => {
   const userId = req.params.id;
   if (!userId) {
@@ -89,7 +126,10 @@ const deleteUser = async (req, res, next) => {
 module.exports = {
   updateUser,
   changePassword,
+  addCourse,
+  storePost,
   setUserStatus,
   setUserRole,
+  setModCourse,
   deleteUser,
 };

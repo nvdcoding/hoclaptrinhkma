@@ -67,6 +67,9 @@ getAllCourse = async (req, res, next) => {
 };
 getOne = async (req, res, next) => {
   const slug = req.params.slug;
+  if (!slug) {
+    return next(appError.badRequest("No slug provided"));
+  }
   const response = await courseService.getOne(slug);
   return res.status(response.status).json({
     data: response.data,

@@ -1,23 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const { isAuth } = require("../http/middlewares/isAuth");
-const { isAdmin } = require("../http/middlewares/isAdmin");
+const { isAuth, hasRoles } = require("../http/middlewares/auth");
 const {
   updateUser,
   setUserStatus,
   setUserRole,
+  setModCourse,
   deleteUser,
   changePassword,
+  addCourse,
+  storePost,
 } = require("../http/controllers/user");
 
-// router.get("/", getAllCourse);
-// router.get("/:slug", getOne);
 /* By USER*/
 router.post("/password", isAuth, changePassword);
 router.put("/", isAuth, updateUser);
+router.put("/course", isAuth, addCourse);
+router.put("/store", isAuth, storePost);
 /* By ADMIN */
-router.put("/status/:id", isAdmin, setUserStatus);
-router.put("/role/:id", isAdmin, setUserRole);
-router.delete("/:id", isAdmin, deleteUser);
+router.put("/status/:id", hasRoles(["ADMIN"]), setUserStatus);
+router.put("/role/:id", hasRoles(["ADMIN"]), setUserRole);
+router.put("/mod/:id", hasRoles(["ADMIN"]), setModCourse);
+router.delete("/:id", hasRoles(["ADMIN"]), deleteUser);
 
 module.exports = router;

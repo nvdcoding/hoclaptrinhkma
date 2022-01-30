@@ -14,8 +14,10 @@ const User = new Schema({
   status: {
     type: String,
     enum: ["active", "disabled"],
-    default: "active",
+    default: "disabled",
   },
+  resetPasswordToken: { type: String },
+  resetPasswordExpries: { type: Date },
 });
 
 module.exports = mongoose.model("User", User);

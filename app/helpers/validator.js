@@ -43,10 +43,26 @@ const validateChangePassword = (params) => {
   });
   return schema.validate(params);
 };
+const validateReport = (params) => {
+  const schema = Joi.object({
+    post: Joi.string().required(),
+    content: Joi.string().required(),
+  });
+  return schema.validate(params);
+};
+const validateModCourse = (params) => {
+  const schema = Joi.object({
+    userId: Joi.string().required(),
+    course: Joi.string().required(),
+  });
+  return schema.validate(params);
+};
 module.exports = {
   validateSignUp,
   validateSignIn,
   validateCourse,
   validateUpdateUser,
   validateChangePassword,
+  validateReport,
+  validateModCourse,
 };
