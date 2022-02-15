@@ -8,14 +8,14 @@ const updateUser = async (req, res, next) => {
     name: req.body.name,
     bio: req.body.bio,
     avatar: req.body.avatar,
-    social: JSON.parse(req.body.social),
+    social: req.body.social,
   };
   const check = validator.validateUpdateUser(params);
   if (check.error) {
     return next(appError.badRequest(check.error.details[0].message));
   }
   const response = await userService.updateUser(params, req.jwtDecoded.id);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -31,7 +31,7 @@ const changePassword = async (req, res, next) => {
     return next(appError.badRequest(check.error.details[0].message));
   }
   const response = await userService.changePassword(params, req.jwtDecoded.id);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -42,7 +42,8 @@ const addCourse = async (req, res, next) => {
     return next(appError.badRequest("Invalid course"));
   }
   const response = await userService.addCourse(courseId, req.jwtDecoded.id);
-  return res.status(response.status).json({
+  return res.json({
+    data: response.data,
     status: response.status,
     message: response.message,
   });
@@ -53,12 +54,67 @@ const storePost = async (req, res, next) => {
     return next(appError.badRequest("Invalid postId"));
   }
   const response = await userService.storePost(postId, req.jwtDecoded.id);
-  return res.status(response.status).json({
+  return res.json({
+    status: response.status,
+    message: response.message,
+  });
+};
+const getStore = async (req, res, next) => {
+  const userId = req.jwtDecoded.id;
+  const response = await userService.getStore(userId);
+  return res.json({
+    data: response.data,
+    status: response.status,
+    message: response.message,
+  });
+};
+const removeStore = async (req, res, next) => {
+  const params = {
+    userId: req.jwtDecoded.id,
+    postId: req.body.postId,
+  };
+  if (!params.userId || !params.postId) {
+    return next(appError.badRequest("Invalid param"));
+  }
+  const response = await userService.removeStore(params);
+  return res.json({
+    status: response.status,
+    message: response.message,
+  });
+};
+const getProfile = async (req, res, next) => {
+  const id = req.jwtDecoded.id;
+  if (!id) {
+    return res.json({
+      status: 400,
+      message: "no user id provided",
+    });
+  }
+  const response = await userService.getProfile(id);
+  return res.json({
+    data: response.data,
     status: response.status,
     message: response.message,
   });
 };
 /* By ADMIN */
+const setUser = async (req, res, next) => {
+  const params = {
+    userId: req.params.id,
+    status: req.body.status,
+    role: req.body.role,
+  };
+  if (
+    !params.status ||
+    !params.userId ||
+    !["active", "disabled"].includes(params.status) ||
+    !params.role ||
+    !["USER", "MOD"].includes(params.role)
+  ) {
+    return next(appError.badRequest("Invalid params"));
+  }
+  const response = await userService.setUser(params);
+};
 const setUserStatus = async (req, res, next) => {
   const params = {
     status: req.body.status.toLowerCase(),
@@ -72,7 +128,7 @@ const setUserStatus = async (req, res, next) => {
     return next(appError.badRequest("Invalid params (status or userId)"));
   }
   const response = await userService.setUserStatus(params);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -90,7 +146,7 @@ const setUserRole = async (req, res, next) => {
     return next(appError.badRequest("Invalid params (role or userId)"));
   }
   const response = await userService.setUserRole(params);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -105,7 +161,7 @@ const setModCourse = async (req, res, next) => {
     return next(appError.badRequest(check.error.details[0].message));
   }
   const response = await userService.setModCourse(params);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -117,12 +173,34 @@ const deleteUser = async (req, res, next) => {
   }
   const response = await userService.deleteUser(userId);
 
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
 };
-
+const getOneUser = async (req, res, next) => {
+  const id = req.params.id;
+  if (!id) {
+    return res.json({
+      status: 400,
+      message: "no user id provided",
+    });
+  }
+  const response = await userService.getOneUser(id);
+  return res.json({
+    data: response.data,
+    status: response.status,
+    message: response.message,
+  });
+};
+const getAllUser = async (req, res, next) => {
+  const response = await userService.getAllUser();
+  return res.json({
+    data: response.data,
+    status: response.status,
+    message: response.message,
+  });
+};
 module.exports = {
   updateUser,
   changePassword,
@@ -132,4 +210,10 @@ module.exports = {
   setUserRole,
   setModCourse,
   deleteUser,
+  getProfile,
+  getOneUser,
+  getAllUser,
+  getStore,
+  removeStore,
+  setUser,
 };

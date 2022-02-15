@@ -6,6 +6,7 @@ createCourse = async (req, res, next) => {
   const params = {
     name: req.body.name,
     description: req.body.description,
+    path: req.body.path,
     goal: req.body.goal,
     img: req.body.img,
     requirement: req.body.requirement,
@@ -15,7 +16,7 @@ createCourse = async (req, res, next) => {
     return next(appError.badRequest(check.error.details[0].message));
   }
   const response = await courseService.createCourse(params, req.jwtDecoded.id);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -24,6 +25,7 @@ updateCourse = async (req, res, next) => {
   const params = {
     name: req.body.name,
     description: req.body.description,
+    path: req.body.path,
     goal: req.body.goal,
     img: req.body.img,
     requirement: req.body.requirement,
@@ -41,7 +43,7 @@ updateCourse = async (req, res, next) => {
     req.jwtDecoded.id,
     courseId
   );
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
@@ -52,26 +54,26 @@ deleteCourse = async (req, res, next) => {
     return next(appError.badRequest("No course provided"));
   }
   const response = await courseService.deleteCourse(courseId);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
 };
 getAllCourse = async (req, res, next) => {
   const response = await courseService.getAllCourse();
-  return res.status(response.status).json({
+  return res.json({
     data: response.data,
     status: response.status,
     message: response.message,
   });
 };
 getOne = async (req, res, next) => {
-  const slug = req.params.slug;
-  if (!slug) {
-    return next(appError.badRequest("No slug provided"));
+  const id = req.params.courseId;
+  if (!id) {
+    return next(appError.badRequest("No id provided"));
   }
-  const response = await courseService.getOne(slug);
-  return res.status(response.status).json({
+  const response = await courseService.getOne(id);
+  return res.json({
     data: response.data,
     status: response.status,
     message: response.message,

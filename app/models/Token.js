@@ -5,7 +5,7 @@ const Token = new Schema({
   user: {
     type: String,
   },
-  refreshToken: { type: String, unique: true },
+  refreshToken: { type: String },
   status: {
     type: String,
     enum: ["active", "disabled"],

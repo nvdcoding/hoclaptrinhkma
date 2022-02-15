@@ -5,7 +5,7 @@ const auth = require("../../services/auth");
 const Token = require("../../../models/Token");
 const validator = require("../../../helpers/validator");
 const date = require("date-and-time");
-signUp = async (req, res, next) => {
+const signUp = async (req, res, next) => {
   const params = {
     name: req.body.name,
     email: req.body.email,
@@ -18,23 +18,23 @@ signUp = async (req, res, next) => {
     return next(appError.badRequest(check.error.details[0].message));
   }
   const response = await auth.signUp(params);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
 };
-activeAccount = async (req, res, next) => {
+const activeAccount = async (req, res, next) => {
   const userId = req.params.id;
   if (!userId) {
     return next(appError.badRequest("No userID provided"));
   }
   const response = await auth.activeAccount(userId);
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     message: response.message,
   });
 };
-signIn = async (req, res, next) => {
+const signIn = async (req, res, next) => {
   const params = {
     email: req.body.email,
     password: req.body.password,
@@ -44,8 +44,12 @@ signIn = async (req, res, next) => {
     return next(appError.badRequest(check.error.details[0].message));
   }
   const response = await auth.signIn(params);
-  if (response.status != 200) {
-    return next(appError.badRequest("Username or password is wrong"));
+  if (response.status === 400) {
+    console.log(response);
+    return res.json({
+      status: response.status,
+      message: response.message,
+    });
   }
   const userData = {
     id: response.user.id,
@@ -78,11 +82,15 @@ signIn = async (req, res, next) => {
     refreshToken: refreshToken,
     expiredAt: date.addDays(now, time),
   });
-  return res
-    .status(200)
-    .json({ status: 200, userData, accessToken, refreshToken });
+  return res.status(response.status).json({
+    status: response.status,
+    userData,
+    courses: response.user.courses,
+    accessToken,
+    refreshToken,
+  });
 };
-refreshToken = async (req, res) => {
+const refreshToken = async (req, res) => {
   const accessTokenLife = process.env.ACCESS_TOKEN_LIFE || "1h";
   const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET || "nguyen-duy-kma";
   const refreshTokenLife = process.env.REFRESH_TOKEN_LIFE || "7d";
@@ -104,7 +112,7 @@ refreshToken = async (req, res) => {
       refreshTokenSecret
     );
     const userData = decoded.data;
-    const accessToken = await jwtHelper.generateToken(
+    const accessToken = await jwtHelper.generate(
       userData,
       accessTokenSecret,
       accessTokenLife
@@ -116,7 +124,7 @@ refreshToken = async (req, res) => {
     return next(appError.badRequest("Invalid Token"));
   }
 };
-logout = async (req, res, next) => {
+const logout = async (req, res, next) => {
   const params = {
     userId: req.body.userId,
   };
@@ -129,10 +137,40 @@ logout = async (req, res, next) => {
     message: "Logout success",
   });
 };
+const forgetPassword = async (req, res, next) => {
+  const email = req.body.email;
+  const check = validator.validateReset({ email });
+  if (check.error) {
+    return next(appError.badRequest(check.error.details[0].message));
+  }
+  const response = await auth.forgetPassword(email);
+  return res.json({
+    status: response.status,
+    message: response.message,
+  });
+};
+const resetPassword = async (req, res, next) => {
+  const params = {
+    token: req.params.token,
+    password: req.body.password,
+    passwordConfirmation: req.body.passwordConfirmation,
+  };
+  const check = validator.validateResetPass(params);
+  if (check.error) {
+    return next(appError.badRequest(check.error.details[0].message));
+  }
+  const response = await auth.resetPassword(params);
+  return res.json({
+    status: response.status,
+    message: response.message,
+  });
+};
 module.exports = {
   signUp,
   signIn,
   logout,
   activeAccount,
   refreshToken,
+  forgetPassword,
+  resetPassword,
 };

@@ -4,13 +4,13 @@ module.exports = {
     const userMail = req.body.email;
     const check = await User.findOne({ email: userMail }).exec();
     if (!check) {
-      return res.status(401).json({
+      return res.json({
         status: 401,
         message: "User not found",
       });
     }
     if (check.status === "disabled") {
-      return res.status(401).json({
+      return res.json({
         status: 401,
         message: "Account is disabled",
       });

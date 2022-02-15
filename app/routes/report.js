@@ -1,10 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const { isAuth } = require("../http/middlewares/isAuth");
-const { isAdmin } = require("../http/middlewares/isAdmin");
-const { createReport } = require("../http/controllers/report");
+const { hasRoles, isAuth } = require("../http/middlewares/auth");
+const {
+  createReport,
+  handleReport,
+  getAllReport,
+} = require("../http/controllers/report");
 
 /* By USER*/
-router.post("/report", createReport);
+router.post("/", isAuth, createReport);
 
+router.put("/", hasRoles(["ADMIN", "MOD"]), handleReport); // 1: xoa bai viet, 2 khoa bai viet
+router.get("/", hasRoles(["ADMIN", "MOD"]), getAllReport);
 module.exports = router;

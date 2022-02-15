@@ -7,13 +7,17 @@ const {
   logout,
   refreshToken,
   activeAccount,
+  forgetPassword,
+  resetPassword,
 } = require("../http/controllers/auth");
 
 router.post("/sign-up", signUp);
 router.post("/sign-in", isActive, signIn);
 router.get("/active/:id", activeAccount);
 router.delete("/logout", logout);
-router.post("/token", refreshToken);
+router.post("/refresh-token", refreshToken);
+router.post("/forgot", forgetPassword);
+router.get("/forgot/:token", resetPassword);
 // router.get('/me', authController.signUp);
 
 module.exports = router;

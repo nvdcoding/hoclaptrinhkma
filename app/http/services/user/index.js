@@ -1,8 +1,9 @@
 const appError = require("../../../helpers/error");
 const User = require("../../../models/User");
 const Course = require("../../../models/Course");
-const Post = require("../../../models/Post");
+const Post = require("../../../models/Blog");
 const Token = require("../../../models/Token");
+const ProcessLearning = require("../../../models/ProcessLearning");
 const bcrypt = require("bcrypt");
 /* by USER */
 const updateUser = async ({ name, bio, avatar, social }, userId) => {
@@ -87,10 +88,14 @@ const addCourse = async (courseId, userId) => {
       courses: userCourses,
     }
   );
-  return {
-    status: 200,
-    message: "Add course success",
-  };
+  const userProcess = await ProcessLearning.findOne({ user: userId }).exec();
+  let processData = userProcess.process;
+  processData.push({ courseId: courseId, process: [] });
+  const process = await ProcessLearning.findOneAndUpdate(
+    { user: userId },
+    { process: processData }
+  );
+  return { data: userCourses, status: 200, message: "Add course success" };
 };
 const storePost = async (postId, userId) => {
   const post = await Post.findOne({ _id: postId }).exec();
@@ -126,6 +131,62 @@ const storePost = async (postId, userId) => {
   return {
     status: 200,
     message: "Store post success",
+  };
+};
+const getStore = async (userId) => {
+  const data = await User.findOne({ _id: userId }).populate({
+    path: "storage",
+    populate: {
+      path: "author",
+    },
+  });
+  console.log(data);
+  return {
+    data: data.storage,
+    status: 200,
+    message: "get store success",
+  };
+};
+const removeStore = async ({ userId, postId }) => {
+  const post = await Post.findOne({ _id: postId }).exec();
+  if (!post) {
+    return {
+      status: 400,
+      message: "Post not found",
+    };
+  }
+  const user = await User.findOne({ _id: userId }).exec();
+  if (!user) {
+    return {
+      status: 400,
+      message: "user not found",
+    };
+  }
+  const storage = user.storage;
+  const result = storage.filter((e) => e !== postId);
+  await User.findOneAndUpdate(
+    { _id: userId },
+    {
+      storage: result,
+    }
+  );
+  return {
+    status: 200,
+    message: "Remove success",
+  };
+};
+const getProfile = async (id) => {
+  const profile = await User.findOne({ _id: id }).exec();
+  if (!profile) {
+    return {
+      status: 400,
+      message: "get profile fail",
+    };
+  }
+  return {
+    data: profile,
+    status: 200,
+    message: "get profile success",
   };
 };
 /*by ADMIN */
@@ -181,6 +242,34 @@ const setUserRole = async ({ role, userId }) => {
   return {
     status: 200,
     message: "Update user role success",
+  };
+};
+const setUser = async ({ userId, status, role }) => {
+  const check = await User.findOne({ _id: userId }).exec();
+  if (!check) {
+    return {
+      status: 404,
+      message: "User not found",
+    };
+  }
+  if (check.roles === "ADMIN") {
+    return {
+      status: 400,
+      message: "Cant not change admin",
+    };
+  }
+  const user = await User.findOneAndUpdate(
+    {
+      _id: userId,
+    },
+    {
+      roles: role,
+      status: status,
+    }
+  );
+  return {
+    status: 200,
+    message: "Set user success",
   };
 };
 const setModCourse = async ({ userId, course }) => {
@@ -244,7 +333,34 @@ const deleteUser = async (id) => {
     message: "delete user success",
   };
 };
-
+const getOneUser = async (id) => {
+  const profile = await User.findOne({ _id: id }).exec();
+  if (!profile) {
+    return {
+      status: 400,
+      message: "get user fail",
+    };
+  }
+  return {
+    data: profile,
+    status: 200,
+    message: "get user success",
+  };
+};
+const getAllUser = async () => {
+  const data = await User.find({}).exec();
+  if (!data) {
+    return {
+      status: 400,
+      message: "No users found",
+    };
+  }
+  return {
+    data: data,
+    status: 200,
+    message: "get list success",
+  };
+};
 module.exports = {
   updateUser,
   changePassword,
@@ -254,4 +370,10 @@ module.exports = {
   setUserRole,
   setModCourse,
   deleteUser,
+  getProfile,
+  getOneUser,
+  getStore,
+  getAllUser,
+  removeStore,
+  setUser,
 };

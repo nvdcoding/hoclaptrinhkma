@@ -1,34 +1,40 @@
 const appError = require("../../../helpers/error");
 const Course = require("../../../models/Course");
-const slug = require("slug");
 const createCourse = async (
-  { name, description, goal, img, requirement },
+  { name, description, path, goal, img, requirement },
   userId
 ) => {
-  const check = await Course.findOne({ name: name }).exec();
+  const check = await Course.findOne({
+    name: name,
+  }).exec();
   if (check) {
     return {
       status: 400,
       message: "Course already exists",
     };
   }
-  const course = await Course.create({
-    name,
-    description,
-    goal,
-    img,
-    requirement,
-    slug: slug(name),
-    created_by: userId,
-    updated_by: userId,
-  });
+  try {
+    const course = await Course.create({
+      name,
+      description,
+      path,
+      goal,
+      img,
+      requirement,
+      created_by: userId,
+      updated_by: userId,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+
   return {
     status: 201,
     message: "create course success",
   };
 };
 const updateCourse = async (
-  { name, description, goal, img, requirement },
+  { name, description, path, goal, img, requirement },
   userId,
   courseId
 ) => {
@@ -44,11 +50,10 @@ const updateCourse = async (
     {
       name,
       description,
+      path,
       goal,
       img,
-      slug: slug(name),
       requirement,
-      created_by: userId,
       updated_by: userId,
       updated_at: Date.now(),
     }
@@ -66,22 +71,31 @@ const deleteCourse = async (courseId) => {
       message: "Course not found",
     };
   }
-  const course = await Course.findByIdAndRemove(courseId);
+  const course = await Course.findOneAndUpdate(
+    { _id: courseId },
+    { deleted_at: Date.now(), name: `${check.name}-deleted` }
+  ); //TODO delete array
   return {
     status: 200,
     message: "Delete course success",
   };
 };
 const getAllCourse = async () => {
-  const courses = await Course.find({});
+  const courses = await Course.find({ deleted_at: null });
   return {
     data: courses,
     status: 200,
     message: "find success",
   };
 };
-const getOne = async (slug) => {
-  const course = await Course.findOne({ slug: slug }).exec();
+const getOne = async (id) => {
+  const course = await Course.findOne({ _id: id }).exec();
+  if (!course) {
+    return {
+      status: 400,
+      message: "Course not found",
+    };
+  }
   return {
     data: course,
     status: 200,

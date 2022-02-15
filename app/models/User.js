@@ -9,15 +9,14 @@ const User = new Schema({
   avatar: { type: String },
   roles: { type: String },
   social: {},
-  courses: [],
-  storage: [],
+  courses: { type: [], ref: "Course" },
+  storage: { type: [], ref: "Blog" },
   status: {
     type: String,
     enum: ["active", "disabled"],
     default: "disabled",
   },
   resetPasswordToken: { type: String },
-  resetPasswordExpries: { type: Date },
 });
 
 module.exports = mongoose.model("User", User);

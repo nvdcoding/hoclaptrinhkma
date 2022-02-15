@@ -1,17 +1,13 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const Post = new Schema({
+const Blog = new Schema({
   title: { type: String, require: true },
-  author: { type: String, require: true },
+  author: { type: String, require: true, ref: "User" },
+  img: { type: String },
   content: { type: String, require: true },
-  status: {
-    type: String,
-    enum: ["noticed", "normal"],
-    default: "normal",
-  },
-  created_by: { type: String },
-  updated_by: { type: String },
+  topic: { type: String, default: "others" },
+  status: { type: String, enum: ["disable", "enable"], default: "disable" },
   created_at: {
     type: Date,
     default: Date.now(),
@@ -22,4 +18,4 @@ const Post = new Schema({
   },
 });
 
-module.exports = mongoose.model("Post", Post);
+module.exports = mongoose.model("Blog", Blog);
