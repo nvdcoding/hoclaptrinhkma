@@ -4,7 +4,7 @@ module.exports = {
     const blogId = req.params.id;
     const blog = await Blog.findOne({ _id: blogId }).exec();
     if (req.jwtDecoded.id !== blog.author) {
-      return res.status(400).json({
+      return res.json({
         status: 400,
         message: "Not Blog's Owner",
       });
@@ -15,7 +15,7 @@ module.exports = {
     const blogId = req.params.id;
     const blog = await Blog.findOne({ _id: blogId }).exec();
     if (!blog) {
-      return res.status(400).json({
+      return res.json({
         status: 400,
         message: "Blog not found",
       });
@@ -25,7 +25,7 @@ module.exports = {
       req.jwtDecoded.roles !== "ADMIN" &&
       req.jwtDecoded.roles !== "MOD"
     ) {
-      return res.status(400).json({
+      return res.json({
         status: 400,
         message: "Not Permisson",
       });

@@ -2,7 +2,8 @@ const appError = require("../../../helpers/error");
 const Course = require("../../../models/Course");
 const createCourse = async (
   { name, description, path, goal, img, requirement },
-  userId
+  userId,
+  language
 ) => {
   const check = await Course.findOne({
     name: name,
@@ -21,6 +22,7 @@ const createCourse = async (
       goal,
       img,
       requirement,
+      language,
       created_by: userId,
       updated_by: userId,
     });
@@ -34,7 +36,7 @@ const createCourse = async (
   };
 };
 const updateCourse = async (
-  { name, description, path, goal, img, requirement },
+  { name, description, path, goal, img, requirement, language },
   userId,
   courseId
 ) => {
@@ -54,6 +56,7 @@ const updateCourse = async (
       goal,
       img,
       requirement,
+      language,
       updated_by: userId,
       updated_at: Date.now(),
     }

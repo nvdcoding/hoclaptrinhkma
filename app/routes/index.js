@@ -7,6 +7,7 @@ const excerciseRouter = require("./excercise");
 const blogRouter = require("./blog");
 const commentRouter = require("./comment");
 const complieRouter = require("./complie");
+const searchRouter = require("./search");
 function route(app) {
   app.use("/api/auth", authRouter);
   app.use("/api/course", courseRouter);
@@ -16,7 +17,8 @@ function route(app) {
   app.use("/api/excercise", excerciseRouter);
   app.use("/api/blog", blogRouter);
   app.use("/api/comment", commentRouter);
-  app.use("/api/complie/", complieRouter);
+  app.use("/api/complie", complieRouter);
+  app.use("/api/search", searchRouter);
 }
 
 module.exports = route;

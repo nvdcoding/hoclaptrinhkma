@@ -10,4 +10,4 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 route(app);
 app.use(apiErrorHandler);
-app.listen(4040);
+app.listen(3000);

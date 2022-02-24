@@ -8,9 +8,10 @@ const User = new Schema({
   bio: { type: String },
   avatar: { type: String },
   roles: { type: String },
-  social: {},
-  courses: { type: [], ref: "Course" },
-  storage: { type: [], ref: "Blog" },
+  social: {}, // thông tin về mạng xã hội: type: object
+  courses: { type: [], ref: "Course" }, // Khóa học user đang theo học
+  manage: { type: [], ref: "Course" }, // Khóa học mod đang quản lý
+  storage: { type: [], ref: "Blog" }, // danh sách bài viết đang lưu trữ
   status: {
     type: String,
     enum: ["active", "disabled"],

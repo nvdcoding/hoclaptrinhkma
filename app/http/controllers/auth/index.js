@@ -82,7 +82,7 @@ const signIn = async (req, res, next) => {
     refreshToken: refreshToken,
     expiredAt: date.addDays(now, time),
   });
-  return res.status(response.status).json({
+  return res.json({
     status: response.status,
     userData,
     courses: response.user.courses,
@@ -117,7 +117,7 @@ const refreshToken = async (req, res) => {
       accessTokenSecret,
       accessTokenLife
     );
-    res.status(200).json({
+    return res.status(200).json({
       accessToken,
     });
   } catch (error) {

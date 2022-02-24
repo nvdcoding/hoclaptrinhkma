@@ -48,19 +48,19 @@ module.exports = {
             req.jwtDecoded = decoded;
             return next();
           } else {
-            return res.status(401).json({
+            return res.json({
               status: 401,
               message: "Dont have permission",
             });
           }
         } catch (error) {
-          return res.status(401).json({
-            status: 401,
+          return res.json({
+            status: 403,
             message: "Unauthorized",
           });
         }
       } else {
-        return res.status(403).json({
+        return res.json({
           message: "No token provided",
         });
       }
@@ -72,14 +72,14 @@ module.exports = {
       return next();
     } else {
       const check = await User.findOne({ _id: req.jwtDecoded.id }).exec();
-      for (let i = 0; i < check.courses.length; i++) {
-        if (req.params.id === check.courses[i]) {
+      for (let i = 0; i < check.manage.length; i++) {
+        if (req.params.id === check.manage[i]) {
           flag = true;
           break;
         }
       }
       if (!flag) {
-        return res.status(401).json({
+        return res.json({
           status: 401,
           message: "Unauthorized",
         });

@@ -17,6 +17,7 @@ const createBlog = async ({ title, author, img, content, topic }) => {
     img,
     content,
     topic,
+    created_at: Date.now(),
     updated_at: Date.now(),
   });
   return {
@@ -47,8 +48,12 @@ const updateBlog = async ({ title, img, content, topic }, blogId) => {
     message: "update blog success",
   };
 };
-const getAllBlog = async () => {
+const getAllBlog = async (pages) => {
+  const perPage = 2;
+  const limit = pages * perPage;
   const data = await Blog.find({ status: "enable" })
+    .sort({ created_at: -1 })
+    .limit(limit)
     .populate("author", "name avatar ")
     .exec();
   return {
@@ -76,7 +81,9 @@ const getOneBlog = async (id) => {
   };
 };
 const getBlogQueue = async () => {
-  const data = await Blog.find({ status: "disable" }).exec();
+  const data = await Blog.find({ status: "disable" })
+    .populate("author", "avatar name")
+    .exec();
   return {
     data,
     status: 200,
@@ -124,7 +131,10 @@ const getTopic = async (topic) => {
   const data = await Blog.find({
     topic: { $regex: topic },
     status: "enable",
-  }).exec();
+  })
+    .sort({ created_at: -1 })
+    .populate("author", "name avatar")
+    .exec();
   return {
     data,
     status: 200,

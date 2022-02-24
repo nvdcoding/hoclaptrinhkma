@@ -97,6 +97,25 @@ const getProfile = async (req, res, next) => {
     message: response.message,
   });
 };
+const getProcess = async (req, res, next) => {
+  const params = {
+    userId: req.jwtDecoded.id,
+    courseId: req.params.courseId,
+  };
+  if (!params.userId || !params.courseId) {
+    return res.json({
+      status: 400,
+      message: "Invalid params",
+    });
+  }
+  const response = await userService.getProcess(params);
+  return res.json({
+    data: response.data,
+    count: response.count,
+    status: response.status,
+    message: response.message,
+  });
+};
 /* By ADMIN */
 const setUser = async (req, res, next) => {
   const params = {
@@ -114,6 +133,11 @@ const setUser = async (req, res, next) => {
     return next(appError.badRequest("Invalid params"));
   }
   const response = await userService.setUser(params);
+  return res.json({
+    data: response.data,
+    status: response.status,
+    message: response.message,
+  });
 };
 const setUserStatus = async (req, res, next) => {
   const params = {
@@ -174,6 +198,7 @@ const deleteUser = async (req, res, next) => {
   const response = await userService.deleteUser(userId);
 
   return res.json({
+    data: response.data,
     status: response.status,
     message: response.message,
   });
@@ -216,4 +241,5 @@ module.exports = {
   getStore,
   removeStore,
   setUser,
+  getProcess,
 };

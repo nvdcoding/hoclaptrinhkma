@@ -19,11 +19,23 @@ const resolveExc = async ({ idExc, answer, language }, userId) => {
       message: "Lesson not found",
     };
   }
-  const last = lesson.excercises[lesson.excercises.length - 1];
-  let isLastEx = false;
-
-  if (idExc === last.toString()) {
-    isLastEx = true;
+  const checkUser = await ProcessLearning.findOne({ user: userId }).exec();
+  for (let i = 0; i < checkUser.process.length; i++) {
+    if (checkUser.process[i].courseId === lesson.course.toString()) {
+      for (let j = 0; j < checkUser.process[i].process.length; j++) {
+        if (
+          checkUser.process[i].process[j].lessonId === lesson._id.toString()
+        ) {
+          if (checkUser.process[i].process[j].excercise.includes(idExc)) {
+            return {
+              data: "",
+              status: 400,
+              message: "Excercise is already resolve",
+            };
+          }
+        }
+      }
+    }
   }
   const cases = check.cases;
   const test = [];
@@ -58,33 +70,36 @@ const resolveExc = async ({ idExc, answer, language }, userId) => {
         console.log(error);
       });
   }
-  if (isLastEx) {
-    let check = true;
-    for (let i = 0; i < test.length; i++) {
-      if (test[i].status == "fail") {
-        check = false;
-        break;
-      }
-    }
-    if (check) {
-      const user = await ProcessLearning.findOne({ user: userId }).exec();
-      const arr = user.process;
-      let result = [];
-      for (let i = 0; i < arr.length; i++) {
-        if (arr[i].courseId === lesson.course) {
-          arr[i].process.push(lesson._id);
-          result = arr[i];
-          break;
-        }
-      }
-      const process = await ProcessLearning.findOneAndUpdate(
-        { user: userId },
-        {
-          process: { courseId: lesson.course, process: result.process },
-        }
-      );
+  // check testcase pass
+  let check2 = true;
+  for (let i = 0; i < test.length; i++) {
+    if (test[i].status == "fail") {
+      check2 = false;
+      break;
     }
   }
+  if (check2) {
+    const user = await ProcessLearning.findOne({ user: userId }).exec();
+    const arr = user.process;
+    for (let i = 0; i < arr.length; i++) {
+      if (arr[i].courseId === lesson.course) {
+        for (let j = 0; j < arr[i].process.length; j++) {
+          if (arr[i].process[j].lessonId === lesson._id.toString()) {
+            arr[i].process[j].excercise.push(idExc);
+            break;
+          }
+        }
+      }
+    }
+    // push to excercise
+    await ProcessLearning.findOneAndUpdate(
+      { user: userId },
+      {
+        process: arr,
+      }
+    );
+  }
+
   return {
     data: test,
     status: 200,

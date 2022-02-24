@@ -10,6 +10,7 @@ createCourse = async (req, res, next) => {
     goal: req.body.goal,
     img: req.body.img,
     requirement: req.body.requirement,
+    language: req.body.language,
   };
   const check = validator.validateCourse(params);
   if (check.error) {
@@ -29,6 +30,7 @@ updateCourse = async (req, res, next) => {
     goal: req.body.goal,
     img: req.body.img,
     requirement: req.body.requirement,
+    language: req.body.language,
   };
   const courseId = req.params.id;
   if (!courseId) {

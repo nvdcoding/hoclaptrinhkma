@@ -3,16 +3,16 @@ const Schema = mongoose.Schema;
 
 const Token = new Schema({
   user: {
-    type: String,
+    type: String, // id user
   },
-  refreshToken: { type: String },
+  refreshToken: { type: String }, // refresh token
   status: {
     type: String,
-    enum: ["active", "disabled"],
+    enum: ["active", "disabled"], // trang thai
     default: "active",
   },
   expiredAt: {
-    type: Date,
+    type: Date, // thoi gian het han
   },
 });
 

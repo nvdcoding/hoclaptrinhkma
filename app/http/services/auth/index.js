@@ -50,7 +50,7 @@ const signIn = async ({ email, password }) => {
   const user = await User.findOne({ email: email }).populate("courses").exec();
   const courses = user.courses.map((e) => {
     return {
-      id: e._id,
+      _id: e._id,
       name: e.name,
       img: e.img,
     };

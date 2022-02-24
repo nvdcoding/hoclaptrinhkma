@@ -15,17 +15,17 @@ module.exports = {
     const commentId = req.params.id;
     const comment = await Comment.findOne({ _id: commentId }).exec();
     if (!comment) {
-      return res.status(400).json({
+      return res.json({
         status: 400,
         message: "Comment not found",
       });
     }
     if (
-      req.jwtDecoded.id !== comment.author &&
+      req.jwtDecoded.id !== comment.author.toString() &&
       req.jwtDecoded.roles !== "ADMIN" &&
       req.jwtDecoded.roles !== "MOD"
     ) {
-      return res.status(400).json({
+      return res.json({
         status: 400,
         message: "Not Permisson",
       });

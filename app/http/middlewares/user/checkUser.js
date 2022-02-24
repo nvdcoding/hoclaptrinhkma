@@ -4,7 +4,7 @@ module.exports = {
     const id = req.params.userId;
     req.jwtDecoded;
     if (id !== req.jwtDecoded.id) {
-      return res.status(403).json({
+      return res.json({
         message: "Not user",
       });
     }

@@ -17,7 +17,7 @@ router.get("/active/:id", activeAccount);
 router.delete("/logout", logout);
 router.post("/refresh-token", refreshToken);
 router.post("/forgot", forgetPassword);
-router.get("/forgot/:token", resetPassword);
+router.put("/forgot/:token", resetPassword);
 // router.get('/me', authController.signUp);
 
 module.exports = router;

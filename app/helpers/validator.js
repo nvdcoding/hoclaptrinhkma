@@ -24,6 +24,7 @@ const validateCourse = (params) => {
     goal: Joi.string().required(),
     img: Joi.string().required(),
     requirement: Joi.string().allow(null, ""),
+    language: Joi.string().required(),
   });
   return schema.validate(params);
 };
@@ -95,8 +96,8 @@ const validateExcercise = (params) => {
     cases: Joi.array()
       .items(
         Joi.object({
-          input: Joi.string().required(),
-          output: Joi.string().required(),
+          input: Joi.string(),
+          output: Joi.string(),
         })
       )
       .required(),

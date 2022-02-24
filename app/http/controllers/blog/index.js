@@ -65,7 +65,8 @@ const changeStatusBlog = async (req, res, next) => {
   });
 };
 const getAllBlog = async (req, res, next) => {
-  const response = await blogService.getAllBlog();
+  const pages = req.query.limit || 0;
+  const response = await blogService.getAllBlog(pages);
   return res.json({
     data: response.data,
     status: response.status,

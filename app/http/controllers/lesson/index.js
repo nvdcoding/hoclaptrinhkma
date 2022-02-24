@@ -32,6 +32,17 @@ getOneLesson = async (req, res, next) => {
     message: response.message,
   });
 };
+getLanguage = async (req, res, next) => {
+  if (!req.params.id) {
+    return next(appError.badRequest("lesson id"));
+  }
+  const response = await lessonService.getLanguage(req.params.id);
+  return res.json({
+    data: response.data,
+    status: response.status,
+    message: response.message,
+  });
+};
 getAllLesson = async (req, res, next) => {
   const id = req.params.id;
   if (!id) {
@@ -88,4 +99,5 @@ module.exports = {
   getAllLesson,
   deleteLesson,
   updateLesson,
+  getLanguage,
 };

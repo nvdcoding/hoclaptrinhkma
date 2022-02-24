@@ -7,10 +7,11 @@ const {
   getAllLesson,
   getOneLesson,
   updateLesson,
+  getOneLessonById,
 } = require("../http/controllers/lesson");
 
 router.get("/:id", getAllLesson);
-
+router.get("/getOne/:id", isAuth, getLanguage);
 // id: courseId
 router.post("/:id", hasRoles(["ADMIN", "MOD"]), checkMod, createLesson);
 router.put(

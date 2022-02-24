@@ -28,6 +28,7 @@ updateExcercise = async (req, res, next) => {
     description: req.body.description,
     cases: req.body.cases,
   };
+
   const excercise = req.params.excerciseId;
   if (!excercise) {
     return next("No excercise provided");

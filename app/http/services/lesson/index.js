@@ -52,15 +52,29 @@ const getOneLesson = async (courseId, id) => {
       message: "Lesson not found",
     };
   }
-  const lesson = await Lesson.findOne({ _id: id }).exec();
+  const lesson = await Lesson.findOne({ _id: id })
+    .populate("excercises")
+    .exec();
   return {
     data: lesson,
     status: 200,
     message: "Get One success",
   };
 };
+const getLanguage = async (id) => {
+  const lesson = await Lesson.findOne({ _id: id })
+    .populate("course", "language")
+    .exec();
+  return {
+    data: lesson.course.language,
+    status: 200,
+    message: "Get One success",
+  };
+};
 const getAllLesson = async (id) => {
-  const lessons = await Lesson.find({ course: id, deleted_at: null }).exec();
+  const lessons = await Lesson.find({ course: id, deleted_at: null })
+    .populate("excercises")
+    .exec();
   return {
     data: lessons,
     status: 200,
@@ -129,4 +143,5 @@ module.exports = {
   getAllLesson,
   deleteLesson,
   updateLesson,
+  getLanguage,
 };

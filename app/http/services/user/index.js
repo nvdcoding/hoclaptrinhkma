@@ -4,6 +4,7 @@ const Course = require("../../../models/Course");
 const Post = require("../../../models/Blog");
 const Token = require("../../../models/Token");
 const ProcessLearning = require("../../../models/ProcessLearning");
+const Lesson = require("../../../models/Lesson");
 const bcrypt = require("bcrypt");
 /* by USER */
 const updateUser = async ({ name, bio, avatar, social }, userId) => {
@@ -58,7 +59,10 @@ const changePassword = async ({ oldPassword, password }, userId) => {
   }
 };
 const addCourse = async (courseId, userId) => {
-  const course = await Course.findOne({ _id: courseId }).exec();
+  const course = await Course.findOne({
+    _id: courseId,
+    deleted_at: null,
+  }).exec();
   const user = await User.findOne({ _id: userId }).exec();
   if (!course) {
     return {
@@ -89,13 +93,33 @@ const addCourse = async (courseId, userId) => {
     }
   );
   const userProcess = await ProcessLearning.findOne({ user: userId }).exec();
+  const lesson = await Lesson.findOne({ course: courseId }).exec();
   let processData = userProcess.process;
-  processData.push({ courseId: courseId, process: [] });
+  const obj = {
+    lessonId: lesson._id,
+    excercise: [],
+  };
+  const childProcess = [];
+  childProcess.unshift(obj);
+  processData.push({
+    courseId: courseId,
+    process: childProcess,
+  });
   const process = await ProcessLearning.findOneAndUpdate(
     { user: userId },
     { process: processData }
   );
-  return { data: userCourses, status: 200, message: "Add course success" };
+  const data = await User.findOne({ _id: userId })
+    .populate("courses", "_id img name")
+    .exec();
+  const result2 = data.courses.map((e) => {
+    return {
+      _id: e._id.toString(),
+      name: e.name,
+      img: e.img,
+    };
+  });
+  return { data: result2, status: 200, message: "Add course success" };
 };
 const storePost = async (postId, userId) => {
   const post = await Post.findOne({ _id: postId }).exec();
@@ -140,7 +164,6 @@ const getStore = async (userId) => {
       path: "author",
     },
   });
-  console.log(data);
   return {
     data: data.storage,
     status: 200,
@@ -187,6 +210,43 @@ const getProfile = async (id) => {
     data: profile,
     status: 200,
     message: "get profile success",
+  };
+};
+const getProcess = async ({ userId, courseId }) => {
+  const lesson = await Lesson.find({ course: courseId })
+    .populate("excercises", "name link excercises")
+    .exec();
+  const userProcess = await ProcessLearning.findOne({
+    user: userId,
+    deleted_at: null,
+  }).exec();
+  const lessonProcess = userProcess.process
+    .filter((e) => e.courseId === courseId)
+    .map((e) => e.process);
+  const result = lesson.map((e) => {
+    if (lessonProcess[0].includes(e._doc._id.toString())) {
+      return {
+        ...e._doc,
+        status: true,
+      };
+    } else {
+      return {
+        ...e._doc,
+        status: false,
+      };
+    }
+  });
+  let c = 0;
+  for (let i = 0; i < result.length; i++) {
+    if (result[i].status) {
+      c++;
+    }
+  }
+  return {
+    data: result,
+    count: c,
+    status: 200,
+    message: "get process success",
   };
 };
 /*by ADMIN */
@@ -267,7 +327,9 @@ const setUser = async ({ userId, status, role }) => {
       status: status,
     }
   );
+  const data = await User.find({});
   return {
+    data: data,
     status: 200,
     message: "Set user success",
   };
@@ -293,7 +355,7 @@ const setModCourse = async ({ userId, course }) => {
       message: "User's Role invalid",
     };
   }
-  const courses = checkUser.courses;
+  const courses = checkUser.manage;
   if (courses.includes(course)) {
     return {
       status: 400,
@@ -303,7 +365,7 @@ const setModCourse = async ({ userId, course }) => {
   courses.push(course);
   const result = await User.findOneAndUpdate(
     { _id: userId },
-    { courses: courses }
+    { manage: courses }
   );
   return {
     status: 200,
@@ -328,7 +390,9 @@ const deleteUser = async (id) => {
     _id: id,
   });
   const token = await Token.deleteOne({ user: id });
+  const data = await User.find({}).exec();
   return {
+    data: data,
     status: 200,
     message: "delete user success",
   };
@@ -376,4 +440,5 @@ module.exports = {
   getAllUser,
   removeStore,
   setUser,
+  getProcess,
 };
