@@ -110,6 +110,7 @@ const getProcess = async (req, res, next) => {
   }
   const response = await userService.getProcess(params);
   return res.json({
+    complete: response.complete,
     data: response.data,
     count: response.count,
     status: response.status,

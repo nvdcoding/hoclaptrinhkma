@@ -122,6 +122,7 @@ const deleteBlog = async (id) => {
     };
   }
   const blog = await Blog.findOneAndDelete({ _id: id });
+  const report = await Report.deleteMany({ post: id });
   return {
     status: 200,
     message: "Delete Blog success",

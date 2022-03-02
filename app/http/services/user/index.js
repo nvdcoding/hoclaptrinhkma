@@ -6,6 +6,7 @@ const Token = require("../../../models/Token");
 const ProcessLearning = require("../../../models/ProcessLearning");
 const Lesson = require("../../../models/Lesson");
 const bcrypt = require("bcrypt");
+const Comment = require("../../../models/Comment");
 /* by USER */
 const updateUser = async ({ name, bio, avatar, social }, userId) => {
   const check = await User.findOne({ _id: userId }).exec();
@@ -213,7 +214,7 @@ const getProfile = async (id) => {
   };
 };
 const getProcess = async ({ userId, courseId }) => {
-  const lesson = await Lesson.find({ course: courseId })
+  const lesson = await Lesson.find({ course: courseId, deleted_at: null })
     .populate("excercises", "name link excercises")
     .exec();
   const userProcess = await ProcessLearning.findOne({
@@ -223,8 +224,10 @@ const getProcess = async ({ userId, courseId }) => {
   const lessonProcess = userProcess.process
     .filter((e) => e.courseId === courseId)
     .map((e) => e.process);
+  const proc = lessonProcess[0].map((e) => e.lessonId);
+  const ex = lessonProcess[0].map((e) => e.excercise);
   const result = lesson.map((e) => {
-    if (lessonProcess[0].includes(e._doc._id.toString())) {
+    if (proc.includes(e._doc._id.toString())) {
       return {
         ...e._doc,
         status: true,
@@ -244,6 +247,7 @@ const getProcess = async ({ userId, courseId }) => {
   }
   return {
     data: result,
+    complete: ex.flat(),
     count: c,
     status: 200,
     message: "get process success",
@@ -390,6 +394,7 @@ const deleteUser = async (id) => {
     _id: id,
   });
   const token = await Token.deleteOne({ user: id });
+  const comment = await Comment.deleteMany({ author: id });
   const data = await User.find({}).exec();
   return {
     data: data,

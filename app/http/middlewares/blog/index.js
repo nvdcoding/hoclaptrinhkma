@@ -3,7 +3,7 @@ module.exports = {
   checkBlogOwner: async (req, res, next) => {
     const blogId = req.params.id;
     const blog = await Blog.findOne({ _id: blogId }).exec();
-    if (req.jwtDecoded.id !== blog.author) {
+    if (req.jwtDecoded.id !== blog.author.toString()) {
       return res.json({
         status: 400,
         message: "Not Blog's Owner",

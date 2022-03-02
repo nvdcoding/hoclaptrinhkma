@@ -16,6 +16,6 @@ router.post("/:post", isAuth, createComment);
 router.get("/:post", getPostComment);
 
 router.delete("/:id", isAuth, checkCommentDelete, deleteComment);
-router.put("/:id", isAuth, updateComment);
+router.put("/:id", isAuth, checkCommentOwner, updateComment);
 
 module.exports = router;

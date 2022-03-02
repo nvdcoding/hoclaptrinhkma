@@ -45,7 +45,6 @@ const signIn = async (req, res, next) => {
   }
   const response = await auth.signIn(params);
   if (response.status === 400) {
-    console.log(response);
     return res.json({
       status: response.status,
       message: response.message,

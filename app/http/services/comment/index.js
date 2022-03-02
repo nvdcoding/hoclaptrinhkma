@@ -29,9 +29,10 @@ const getPostComment = async (postId) => {
     deleted_at: null,
   }).populate("author");
   const result = comment.map((e) => {
-    e.author = e.author.name;
-    e.avatar = e.author.avatar;
-    e.authorId = e.author._id;
+    console.log(e);
+    e.author = e.author.name ? e.author.name : "Unknown";
+    e.avatar = e.author?.avatar;
+    e.authorId = e.author?._id;
     return {
       authorName: e.author.name,
       authorAvatar: e.author.avatar,
@@ -83,6 +84,7 @@ const updateComment = async ({ id, content }) => {
     message: "update comment success",
   };
 };
+
 module.exports = {
   createComment,
   getPostComment,
