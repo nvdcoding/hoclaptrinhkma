@@ -1,24 +1,29 @@
-const nodeMailer = require("nodemailer");
-
-const account = {
-  user: process.env.GMAIL_ACCOUNT,
-  pass: process.env.GMAIL_PASS,
-};
-const mailHost = "smtp.gmail.com";
-const mailPort = 587;
+const axios = require('axios');
+const qs = require('qs');
 const sendMail = (to, subject, content) => {
-  const transporter = nodeMailer.createTransport({
-    host: mailHost,
-    port: mailPort,
-    secure: false,
-    auth: account,
+  const data = qs.stringify({
+    'from': 'Admin <mailgun@mail.kma-news.tech>',
+    'to': to,
+    'subject': subject,
+    'html': content
   });
-  const options = {
-    from: account.user,
-    to,
-    subject,
-    html: content,
+  const config = {
+    method: 'post',
+    url: 'https://api.mailgun.net/v3/mail.kma-news.tech/messages',
+    headers: {
+      'Authorization': 'Basic YXBpOjEwMzI1YzZlMWQ2OTI2NWRiNWFlNjY0ODJhMmZhMzE4LWMzZDFkMWViLWRhNDg5ZjIw',
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    data: data
   };
-  return transporter.sendMail(options);
-};
+  axios(config)
+    .then(function (response) {
+      console.log(JSON.stringify(response.data));
+    })
+    .catch(function (error) {
+      console.log(error);
+    });
+}
+
+
 module.exports = { sendMail };

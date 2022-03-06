@@ -24,8 +24,9 @@ const signUp = async ({ name, email, password }) => {
     roles: Roles.USER,
   });
   try {
-    const link = `${process.env.DOMAIN_API}/auth/active/${user._id}`;
-    const mailContent = `Bạn vui lòng truy cập link: ${link} <br>Để kích hoạt tài khoản`;
+    const link = `http://${process.env.DOMAIN_API}active/${user._id}`;
+
+    const mailContent = `Bạn vui lòng truy cập vào <a href="${link}">đây</a><br>Để kích hoạt tài khoản`;
     await mailer.sendMail(email, "Kích hoạt tài khoản", mailContent);
   } catch (e) {
     console.log(e);
@@ -117,9 +118,9 @@ const forgetPassword = async (email) => {
     { resetPasswordToken: resetToken }
   );
   try {
-    const link = `${process.env.DOMAIN_API}/auth/forgot/${resetToken}`;
-    const mailContent = `Bạn vui lòng truy cập link: ${link} <br>Để đặt lại mật khẩu`;
-    await mailer.sendMail(email, "Kích hoạt tài khoản", mailContent);
+    const link = `http://${process.env.DOMAIN_API}forgot-password/${resetToken}`;
+    const mailContent = `Bạn vui lòng truy cập vào <a href="${link}">đây</a><br>Để đặt lại mật khẩu`;
+    await mailer.sendMail(email, "Đặt lại mật khẩu", mailContent);
     return {
       status: 200,
       message: "success",

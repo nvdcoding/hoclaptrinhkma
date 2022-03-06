@@ -77,7 +77,7 @@ const resolveExc = async ({ idExc, answer, language }, userId) => {
       for (let i = 0; i < cases.length; i++) {
         const key = `case${i}`;
         const program = {
-          script: code,
+          script: answer,
           language: language,
           versionIndex: "0",
           clientId: process.env.JDOODLE_CLIENT_ID,
