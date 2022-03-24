@@ -43,6 +43,8 @@ const resolveExc = async ({ idExc, answer, language }, userId) => {
       for (let i = 0; i < cases.length; i++) {
         const key = `case${i}`;
         const testcase = cases[i].input.replace(" ", ",");
+        console.log(testcase);
+
         let code = `${answer} console.log(resolve(${testcase}))`;
         const program = {
           script: code,
@@ -84,6 +86,7 @@ const resolveExc = async ({ idExc, answer, language }, userId) => {
           clientSecret: process.env.JDOODLE_CLIENT_SECRET,
           stdin: cases[i].input.replace(",", " "),
         };
+        console.log(typeof program.stdin);
         await axios
           .post("https://api.jdoodle.com/v1/execute", program)
           .then(function (response) {

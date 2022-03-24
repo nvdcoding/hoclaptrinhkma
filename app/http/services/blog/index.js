@@ -1,5 +1,6 @@
 const appError = require("../../../helpers/error");
 const Blog = require("../../../models/Blog");
+const Report = require("../../../models/Report");
 const createBlog = async ({ title, author, img, content, topic }) => {
   const check = await Blog.findOne({
     title: title,

@@ -29,8 +29,7 @@ const getPostComment = async (postId) => {
     deleted_at: null,
   }).populate("author");
   const result = comment.map((e) => {
-    console.log(e);
-    e.author = e.author.name ? e.author.name : "Unknown";
+    e.author = e.author?.name ? e.author.name : "Unknown";
     e.avatar = e.author?.avatar;
     e.authorId = e.author?._id;
     return {

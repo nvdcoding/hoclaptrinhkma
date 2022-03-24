@@ -9,6 +9,7 @@ const search = async (key) => {
         $regex: key,
         $options: "i",
       },
+      status: "enable"
     },
     {
       title: 1,
@@ -21,6 +22,8 @@ const search = async (key) => {
         $regex: key,
         $options: "i",
       },
+      deleted_at: null
+
     },
     { name: 1, img: 1 }
   );
@@ -30,6 +33,7 @@ const search = async (key) => {
         $regex: key,
         $options: "i",
       },
+      deleted_at: null
     },
     { name: 1, link: 1 }
   )

@@ -8,6 +8,7 @@ const blogRouter = require("./blog");
 const commentRouter = require("./comment");
 const complieRouter = require("./complie");
 const searchRouter = require("./search");
+const statisticRouter = require("./statistic");
 function route(app) {
   app.use("/api/auth", authRouter);
   app.use("/api/course", courseRouter);
@@ -19,6 +20,7 @@ function route(app) {
   app.use("/api/comment", commentRouter);
   app.use("/api/complie", complieRouter);
   app.use("/api/search", searchRouter);
+  app.use("/api/statistic", statisticRouter);
 }
 
 module.exports = route;

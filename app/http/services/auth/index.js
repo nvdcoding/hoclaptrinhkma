@@ -26,7 +26,7 @@ const signUp = async ({ name, email, password }) => {
   try {
     const link = `http://${process.env.DOMAIN_API}active/${user._id}`;
 
-    const mailContent = `Bạn vui lòng truy cập vào <a href="${link}">đây</a><br>Để kích hoạt tài khoản`;
+    const mailContent = `Bạn vui lòng truy cập vào <a href="${link}">đây</a> hoặc truy cập ${link} (vì lí do bảo mật link có thể bị xóa, bạn vui lòng truy cập domain/active/${user._id})<br>Để kích hoạt tài khoản`;
     await mailer.sendMail(email, "Kích hoạt tài khoản", mailContent);
   } catch (e) {
     console.log(e);
@@ -85,7 +85,13 @@ const activeAccount = async (userId) => {
       message: "User not found",
     };
   }
-  const process = await ProcessLearning.create({
+  if (user.status === "active") {
+    return {
+      status: 400,
+      message: "Account is already active",
+    }
+  }
+  await ProcessLearning.create({
     user: userId,
     process: [],
   });
@@ -119,7 +125,7 @@ const forgetPassword = async (email) => {
   );
   try {
     const link = `http://${process.env.DOMAIN_API}forgot-password/${resetToken}`;
-    const mailContent = `Bạn vui lòng truy cập vào <a href="${link}">đây</a><br>Để đặt lại mật khẩu`;
+    const mailContent = `Bạn vui lòng truy cập vào <a href="${link}">đây</a> (vì lí do bảo mật link có thể bị xóa, bạn vui lòng truy cập domain/forgot-password/${resetToken})<br>Để đặt lại mật khẩu hoặc truy cập ${link}`;
     await mailer.sendMail(email, "Đặt lại mật khẩu", mailContent);
     return {
       status: 200,

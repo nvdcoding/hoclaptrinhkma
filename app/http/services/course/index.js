@@ -1,9 +1,8 @@
 const appError = require("../../../helpers/error");
 const Course = require("../../../models/Course");
 const createCourse = async (
-  { name, description, path, goal, img, requirement },
-  userId,
-  language
+  { name, description, path, goal, img, requirement, language },
+  userId
 ) => {
   const check = await Course.findOne({
     name: name,
@@ -78,6 +77,7 @@ const deleteCourse = async (courseId) => {
     { _id: courseId },
     { deleted_at: Date.now(), name: `${check.name}-deleted` }
   ); //TODO delete array
+
   return {
     status: 200,
     message: "Delete course success",

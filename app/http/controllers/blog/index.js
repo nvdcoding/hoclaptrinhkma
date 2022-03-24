@@ -12,7 +12,10 @@ const createBlog = async (req, res, next) => {
   };
   const check = validator.validateBlog(params);
   if (check.error) {
-    return next(appError.badRequest(check.error.details[0].message));
+    return res.json({
+      status: 400,
+      message: "Vui lòng kiểm tra tham số truyền vào",
+    });
   }
   const response = await blogService.createBlog(params);
   return res.json({
